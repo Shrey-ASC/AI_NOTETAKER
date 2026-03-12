@@ -1,47 +1,55 @@
-import flask from flask 
-import request
-import jsonify
-import os
-import json
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
+# data
 notes = [
-    {"id": 1, "title": "Physics"},
-    {"id": 2, "title": "Grammar"},
-    {"id": 3, "title": "maths"}
+    {"id": 1, "note": "API"},
+    {"id": 2, "note": " DSA"}
 ]
 
+# read
 @app.route('/notes', methods=['GET'])
 def get_notes():
     return jsonify(notes)
 
-@app.route('/notes/<int:note_id>', methods=['GET'])
-def get_note(note_id):
-    note = next((note for note in notes if note["id"] == note_id), None)
-    return jsonify(note) if note else (jsonify({"error": "Note not found"}), 404)
 
+# create
 @app.route('/notes', methods=['POST'])
 def add_note():
-    new_note = request.json
+    data = request.get_json()
+    new_note = {
+        "id": len(notes) + 1,
+        "note": data["note"]
+    }
     notes.append(new_note)
-    return jsonify(new_note), 201
+    return jsonify(new_note)
 
-@app.route('/notes/<int:note_id>', methods=['PUT'])
-def update_note(note_id):
-    note = next((note for note in notes if note["id"] == note_id), None)
-    if not note:
-        return jsonify({"error": "Note not found"}), 404
 
-    data = request.json
-    note.update(data)
-    return jsonify(note)
+# update
+@app.route('/notes/<int:id>', methods=['PUT'])
+def update_note(id):
+    data = request.get_json()
+    
+    for note in notes:
+        if note["id"] == id:
+            note["note"] = data["note"]
+            return jsonify(note)
 
-@app.route('/notes/<int:note_id>', methods=['DELETE'])
-def delete_note(note_id):
-    global notes
-    notes = [note for note in notes if note["id"] != note_id]
-    return jsonify({"message": "Note deleted"})
+    return {"message": "Note not found"}
+
+
+# delete
+@app.route('/notes/<int:id>', methods=['DELETE'])
+def delete_note(id):
+
+    for note in notes:
+        if note["id"] == id:
+            notes.remove(note)
+            return {"message": "Note deleted"}
+
+    return {"message": "Note not found"}
+
 
 if __name__ == '__main__':
     app.run(debug=True)
