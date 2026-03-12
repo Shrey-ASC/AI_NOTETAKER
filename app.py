@@ -1,51 +1,70 @@
+
 from flask import Flask, jsonify, request
+import json
 
 app = Flask(__name__)
 
-# data
-notes = [
-    {"id": 1, "note": "API"},
-    {"id": 2, "note": " DSA"}
-]
+FILE = 'notes.json'
 
-# read
+
+def readnote():
+    with open(FILE, 'r') as f:
+        return json.load(f)
+
+
+def writenote(notes):
+    with open(FILE, 'w') as f:
+        json.dump(notes, f, indent=4)
+
+
+# READ
 @app.route('/notes', methods=['GET'])
-def get_notes():
+def getnotes():
+    notes = readnote()
     return jsonify(notes)
 
 
-# create
+# CREATE
 @app.route('/notes', methods=['POST'])
-def add_note():
+def addnote():
+    notes = readnote()
     data = request.get_json()
+
     new_note = {
         "id": len(notes) + 1,
         "note": data["note"]
     }
+
     notes.append(new_note)
+    writenote(notes)
+
     return jsonify(new_note)
 
 
-# update
+# UPDATE
 @app.route('/notes/<int:id>', methods=['PUT'])
-def update_note(id):
+def updatenote(id):
+    notes = readnote()
     data = request.get_json()
-    
+
     for note in notes:
         if note["id"] == id:
             note["note"] = data["note"]
+            writenote(notes)
             return jsonify(note)
 
     return {"message": "Note not found"}
 
 
-# delete
+# DELETE
 @app.route('/notes/<int:id>', methods=['DELETE'])
-def delete_note(id):
+def deletenote(id):
+    notes = readnote()
 
     for note in notes:
         if note["id"] == id:
             notes.remove(note)
+            writenote(notes)
             return {"message": "Note deleted"}
 
     return {"message": "Note not found"}
