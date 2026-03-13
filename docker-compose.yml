@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  flask-app:
+    build: .
+    container_name: AI_NOTETAKER
+    
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    restart: always
