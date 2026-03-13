@@ -1,1 +1,18 @@
-{}
+[
+    {
+        "id": 1,
+        "note": "new_updated note"
+    },
+    {
+        "id": 2,
+        "note": "new_updated note"
+    },
+    {
+        "id": 4,
+        "note": " 3 note"
+    },
+    {
+        "id": 4,
+        "note": "autonote"
+    }
+]
